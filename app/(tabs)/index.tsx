@@ -19,9 +19,6 @@ export default function Index() {
           <SearchBar
             onPress={() => router.push("/search")}
             placeholder="Search for a movie"
-            value=""
-            onChangeText={() => {}}
-            placeholderTextColor="#a8b5db"
           />
         </View>
       </ScrollView>
