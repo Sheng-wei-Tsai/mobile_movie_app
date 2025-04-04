@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {View, Text, Image, FlatList, ActivityIndicator} from 'react-native';
 
 import {images} from "@/constants/images";
@@ -7,6 +7,7 @@ import {icons} from "@/constants/icons";
 import useFetch from "@/services/useFetch";
 import {fetchMovies} from "@/services/api";
 import { updateSearchCount } from "@/services/appwrite";
+import { useTrending } from "@/services/TrendingContext";
 
 
 import SearchBar from "@/components/SearchBar";
@@ -15,8 +16,10 @@ import MovieCard from "@/components/MovieCard";
 
 const Search = () => {
     const [searchQuery, setSearchQuery] = useState('');
-
-
+    const [finalSearchQuery, setFinalSearchQuery] = useState('');
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const searchCountedRef = useRef<boolean>(false);
+    const { refreshTrending } = useTrending();
 
     const {
         data: movies = [],
@@ -24,26 +27,48 @@ const Search = () => {
         refetch: loadMovies,
         reset,
         error: moviesError} = useFetch(() => fetchMovies({
-        query: searchQuery
+        query: finalSearchQuery
     }), false);
 
-    // Debounced search effect
+    // Debounced search effect for UI updates
     useEffect(() => {
-        const timeoutId = setTimeout(async () => {
-            if (searchQuery.trim()) {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(() => {
+            setFinalSearchQuery(searchQuery);
+            searchCountedRef.current = false;
+        }, 5000); // 5 seconds debounce
+
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [searchQuery]);
+
+    // Effect to update search count only when final search query changes
+    useEffect(() => {
+        const updateSearch = async () => {
+            if (finalSearchQuery.trim() && !searchCountedRef.current) {
                 await loadMovies();
 
-                // Call updateSearchCount only if there are results
+                // Call updateSearchCount only if there are results and we haven't counted this search yet
                 if (movies?.length! > 0 && movies?.[0]) {
-                    await updateSearchCount(searchQuery, movies[0]);
+                    await updateSearchCount(finalSearchQuery, movies[0]);
+                    searchCountedRef.current = true;
+                    
+                    // Refresh trending movies after successful search count
+                    refreshTrending();
                 }
-            } else {
+            } else if (!finalSearchQuery.trim()) {
                 reset();
             }
-        }, 500);
+        };
 
-        return () => clearTimeout(timeoutId);
-    }, [searchQuery]);
+        updateSearch();
+    }, [finalSearchQuery, movies, refreshTrending]);
 
     return (
         <View className="flex-1 bg-primary">
@@ -78,10 +103,10 @@ const Search = () => {
                     {moviesError && (
                         <Text className="text-red-500 px-5 my-3"> Error: {moviesError.message} </Text>
                     )}
-                    {!moviesLoading && !moviesError && searchQuery.trim() && movies?.length > 0 && (
+                    {!moviesLoading && !moviesError && finalSearchQuery.trim() && movies?.length > 0 && (
                         <Text className="text-xl text-white font-bold">
                             Search Results for {''}
-                            <Text className="text-accent">{searchQuery}</Text>
+                            <Text className="text-accent">{finalSearchQuery}</Text>
                         </Text>
                     )}
                 </>
@@ -90,7 +115,7 @@ const Search = () => {
                     !moviesLoading && !moviesError ? (
                         <View className="mt-10 px-5">
                             <Text className="text-center text-gray-500">
-                                {searchQuery.trim() ? 'No movies found' : 'Search for a movie'}
+                                {finalSearchQuery.trim() ? 'No movies found' : 'Search for a movie'}
                             </Text>
                         </View>
                     ) : null

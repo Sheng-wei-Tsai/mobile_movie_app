@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Image, ScrollView,Text, View, ActivityIndicator, FlatList } from "react-native";
 import {images} from "@/constants/images";
 import {icons} from "@/constants/icons";
@@ -9,17 +9,24 @@ import {fetchMovies} from "@/services/api"
 import {getTrendingMovies} from "@/services/appwrite";
 import MovieCard from "@/components/MovieCard";
 import TrendingCard from "@/components/TrendingCard";
+import { useTrending } from "@/services/TrendingContext";
 
 export default function Index() {
 
   const router = useRouter();
+  const { setRefreshTrending } = useTrending();
 
   const {
       data: trendingMovies,
       loading: trendingLoading,
       error: trendingError,
-
+      refetch: refetchTrending
   } = useFetch(getTrendingMovies);
+
+  // Register the refresh function with the context
+  useEffect(() => {
+    setRefreshTrending(refetchTrending);
+  }, [refetchTrending, setRefreshTrending]);
 
   const {
       data: movies,
