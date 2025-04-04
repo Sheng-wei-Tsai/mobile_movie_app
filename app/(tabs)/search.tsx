@@ -6,9 +6,12 @@ import {icons} from "@/constants/icons";
 
 import useFetch from "@/services/useFetch";
 import {fetchMovies} from "@/services/api";
-import {useRouter} from "expo-router";
-import MovieCard from "@/components/MovieCard";
+import { updateSearchCount } from "@/services/appwrite";
+
+
 import SearchBar from "@/components/SearchBar";
+import MovieCard from "@/components/MovieCard";
+
 
 const Search = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -16,25 +19,31 @@ const Search = () => {
 
 
     const {
-        data: movies,
+        data: movies = [],
         loading: moviesLoading,
         refetch: loadMovies,
         reset,
         error: moviesError} = useFetch(() => fetchMovies({
         query: searchQuery
-    }), false)
+    }), false);
 
+    // Debounced search effect
     useEffect(() => {
-        const timeoutId= setTimeout(async() => {
-            if(searchQuery.trim()) {
+        const timeoutId = setTimeout(async () => {
+            if (searchQuery.trim()) {
                 await loadMovies();
+
+                // Call updateSearchCount only if there are results
+                if (movies?.length! > 0 && movies?.[0]) {
+                    await updateSearchCount(searchQuery, movies[0]);
+                }
             } else {
                 reset();
             }
         }, 500);
-        return () => clearTimeout(timeoutId);
-    }, [searchQuery])
 
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery]);
 
     return (
         <View className="flex-1 bg-primary">
