@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { Image, ScrollView,Text, View, ActivityIndicator, FlatList } from "react-native";
 import {images} from "@/constants/images";
-import {icons} from "@/constants/icons";
+import {icons } from "@/constants/icons";
 import SearchBar from "@/components/SearchBar";
 import {useRouter} from "expo-router";
 import useFetch from "@/services/useFetch";
