@@ -10,6 +10,8 @@ A modern, responsive mobile application for discovering, searching, and tracking
 - **Search Functionality**: Find movies by title with real-time search results
 - **Trending Movies**: See what's popular based on user search patterns
 - **Movie Details**: View comprehensive information about each movie
+- **User Profile**: Manage account settings and preferences
+- **Theme Switching**: Toggle between light and dark modes
 - **Responsive Design**: Beautiful UI that works across different device sizes
 - **Offline Support**: Cached data for improved performance
 
@@ -23,12 +25,14 @@ A modern, responsive mobile application for discovering, searching, and tracking
   - TMDB API for movie data
 - **Navigation**: Expo Router
 - **UI Components**: Custom components with modern design
+- **Theming**: Custom theme context with light/dark mode support
 
 ## Screenshots
 
 ![Home Screen](screenshots/home.png)
 ![Search Screen](screenshots/search.png)
 ![Movie Details](screenshots/details.png)
+![Profile Screen](screenshots/profile.png)
 
 ## Getting Started
 
@@ -98,22 +102,31 @@ The app tracks user search patterns using Appwrite and displays trending movies 
 ### Search Functionality
 The search feature includes debouncing to prevent excessive API calls and provides real-time results as users type. Search terms are tracked to update the trending movies section.
 
-### Movie Details
-Each movie has a dedicated details page showing comprehensive information including:
-- Title and release date
-- Rating and popularity
-- Overview and cast information
-- Related movies
+### User Profile
+The profile page allows users to:
+- Toggle notifications
+- Switch between light and dark themes
+- View app information and version
+- Access terms of service and privacy policy
+
+### Theme Switching
+The app supports both light and dark themes:
+- Theme context manages the current theme state across the app
+- Theme toggle in the profile page allows users to switch between modes
+- All components adapt to the current theme
+- Theme preference is persisted across app sessions
+- Follows Tailwind CSS conventions for consistent styling
+
+### Responsive Design
+The app is designed to work seamlessly across different device sizes:
+- Flexible layouts that adapt to screen dimensions
+- Scrollable content areas for better usability
+- Consistent spacing and typography
+- Optimized touch targets for mobile interaction
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
