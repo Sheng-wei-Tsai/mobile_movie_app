@@ -1,152 +1,174 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, Switch } from 'react-native';
-import { router } from 'expo-router';
-import { icons } from '@/constants/icons';
+import React from 'react';
+import { View, Text, TouchableOpacity, Switch } from 'react-native';
+import { useTheme } from '@/services/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ProfileSectionProps {
   title: string;
   children: React.ReactNode;
 }
 
-const ProfileSection = ({ title, children }: ProfileSectionProps) => {
+const ProfileSection: React.FC<ProfileSectionProps> = ({ title, children }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   return (
     <View className="mb-6">
-      <Text className="text-white font-bold text-lg mb-3">{title}</Text>
-      <View className="bg-dark-100 rounded-lg p-4">
-        {children}
-      </View>
+      <Text className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-dark-100'}`}>
+        {title}
+      </Text>
+      {children}
     </View>
   );
 };
 
 interface SettingItemProps {
-  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
   value?: string | boolean;
   onPress?: () => void;
   isSwitch?: boolean;
   onValueChange?: (value: boolean) => void;
 }
 
-const SettingItem = ({ label, value, onPress, isSwitch, onValueChange }: SettingItemProps) => {
+const SettingItem: React.FC<SettingItemProps> = ({
+  icon,
+  title,
+  value,
+  onPress,
+  isSwitch,
+  onValueChange,
+}) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   return (
-    <View className="flex-row items-center justify-between py-3 border-b border-dark-200">
-      <Text className="text-light-200 text-base">{label}</Text>
+    <TouchableOpacity
+      onPress={onPress}
+      className={`flex-row items-center justify-between p-4 rounded-lg mb-2 ${
+        isDark ? 'bg-dark-200' : 'bg-light-200'
+      }`}
+    >
+      <View className="flex-row items-center">
+        <Ionicons
+          name={icon}
+          size={24}
+          color={isDark ? '#AB8BFF' : '#7B5CF5'}
+          className="mr-3"
+        />
+        <Text className={`text-base ${isDark ? 'text-white' : 'text-dark-100'}`}>
+          {title}
+        </Text>
+      </View>
       {isSwitch ? (
         <Switch
           value={value as boolean}
           onValueChange={onValueChange}
-          trackColor={{ false: '#2A2A2A', true: '#AB8BFF' }}
-          thumbColor="#FFFFFF"
+          trackColor={{ false: '#767577', true: '#AB8BFF' }}
+          thumbColor={value ? '#7B5CF5' : '#f4f3f4'}
         />
       ) : (
-        <TouchableOpacity onPress={onPress} className="flex-row items-center">
-          <Text className="text-light-300 text-base mr-2">{value}</Text>
-          <Image source={icons.arrow} className="size-4" tintColor="#A8B5DB" />
-        </TouchableOpacity>
+        <View className="flex-row items-center">
+          {value && (
+            <Text className={`mr-2 ${isDark ? 'text-light-100' : 'text-light-300'}`}>
+              {value}
+            </Text>
+          )}
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={isDark ? '#A8B5DB' : '#6C79A3'}
+          />
+        </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 };
 
-const Profile = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
-  const [language, setLanguage] = useState('English');
-  const [region, setRegion] = useState('United States');
+export default function Profile() {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
+  const [notifications, setNotifications] = React.useState(true);
 
   return (
-    <View className="flex-1 bg-primary">
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Profile Header */}
-        <View className="bg-dark-100 pt-12 pb-6 px-5">
-          <View className="flex-row items-center">
-            <Image
-              source={{ uri: 'https://ui-avatars.com/api/?name=User&background=AB8BFF&color=fff' }}
-              className="size-20 rounded-full"
+    <View className={`flex-1 ${isDark ? 'bg-primary' : 'bg-primary-light'}`}>
+      <View className="p-6">
+        <View className={`items-center mb-8 p-6 rounded-xl ${
+          isDark ? 'bg-dark-100' : 'bg-light-100'
+        }`}>
+          <View className={`w-20 h-20 rounded-full items-center justify-center mb-4 ${
+            isDark ? 'bg-dark-200' : 'bg-light-200'
+          }`}>
+            <Ionicons
+              name="person"
+              size={40}
+              color={isDark ? '#AB8BFF' : '#7B5CF5'}
             />
-            <View className="ml-4">
-              <Text className="text-white font-bold text-xl">User Name</Text>
-              <Text className="text-light-300 text-base">user@example.com</Text>
-              <TouchableOpacity className="mt-2 bg-accent rounded-full py-1 px-3">
-                <Text className="text-white font-medium text-sm">Edit Profile</Text>
-              </TouchableOpacity>
-            </View>
           </View>
+          <Text className={`text-xl font-bold mb-1 ${isDark ? 'text-white' : 'text-dark-100'}`}>
+            John Doe
+          </Text>
+          <Text className={`${isDark ? 'text-light-100' : 'text-light-300'}`}>
+            john.doe@example.com
+          </Text>
         </View>
 
-        <View className="px-5 pt-6">
-          {/* Account Settings */}
-          <ProfileSection title="Account Settings">
-            <SettingItem 
-              label="Email" 
-              value="user@example.com" 
-              onPress={() => console.log('Change email')} 
-            />
-            <SettingItem 
-              label="Password" 
-              value="********" 
-              onPress={() => console.log('Change password')} 
-            />
-            <SettingItem 
-              label="Notifications" 
-              isSwitch 
-              value={notifications} 
-              onValueChange={setNotifications} 
-            />
-            <SettingItem 
-              label="Dark Mode" 
-              isSwitch 
-              value={darkMode} 
-              onValueChange={setDarkMode} 
-            />
-          </ProfileSection>
+        <ProfileSection title="Account Settings">
+          <SettingItem
+            icon="mail-outline"
+            title="Change Email"
+            value="john.doe@example.com"
+            onPress={() => console.log('Change email')}
+          />
+          <SettingItem
+            icon="lock-closed-outline"
+            title="Change Password"
+            onPress={() => console.log('Change password')}
+          />
+        </ProfileSection>
 
-          {/* Preferences */}
-          <ProfileSection title="Preferences">
-            <SettingItem 
-              label="Language" 
-              value={language} 
-              onPress={() => console.log('Change language')} 
-            />
-            <SettingItem 
-              label="Region" 
-              value={region} 
-              onPress={() => console.log('Change region')} 
-            />
-            <SettingItem 
-              label="Content Rating" 
-              value="PG-13" 
-              onPress={() => console.log('Change content rating')} 
-            />
-          </ProfileSection>
+        <ProfileSection title="Preferences">
+          <SettingItem
+            icon="notifications-outline"
+            title="Notifications"
+            isSwitch
+            value={notifications}
+            onValueChange={setNotifications}
+          />
+          <SettingItem
+            icon="moon-outline"
+            title="Dark Mode"
+            isSwitch
+            value={isDark}
+            onValueChange={toggleTheme}
+          />
+        </ProfileSection>
 
-          {/* App Info */}
-          <ProfileSection title="App Info">
-            <SettingItem 
-              label="Version" 
-              value="1.0.0" 
-            />
-            <SettingItem 
-              label="Terms of Service" 
-              onPress={() => console.log('View terms')} 
-            />
-            <SettingItem 
-              label="Privacy Policy" 
-              onPress={() => console.log('View privacy policy')} 
-            />
-          </ProfileSection>
+        <ProfileSection title="App Info">
+          <SettingItem
+            icon="information-circle-outline"
+            title="Version"
+            value="1.0.0"
+          />
+          <SettingItem
+            icon="document-text-outline"
+            title="Terms of Service"
+            onPress={() => console.log('Terms of Service')}
+          />
+          <SettingItem
+            icon="shield-outline"
+            title="Privacy Policy"
+            onPress={() => console.log('Privacy Policy')}
+          />
+        </ProfileSection>
 
-          {/* Logout Button */}
-          <TouchableOpacity 
-            className="bg-red-500 rounded-lg py-3.5 mt-4 flex items-center"
-            onPress={() => console.log('Logout')}
-          >
-            <Text className="text-white font-semibold text-base">Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        <TouchableOpacity
+          className={`mt-6 p-4 rounded-lg ${isDark ? 'bg-dark-200' : 'bg-light-200'}`}
+          onPress={() => console.log('Logout')}
+        >
+          <Text className={`text-center font-bold ${isDark ? 'text-white' : 'text-dark-100'}`}>
+            Logout
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-};
-
-export default Profile;
+}
