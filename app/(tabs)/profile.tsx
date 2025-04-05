@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, Switch, ScrollView } from 'react-native';
 import { useTheme } from '@/services/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -90,85 +90,91 @@ export default function Profile() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-primary' : 'bg-primary-light'}`}>
-      <View className="p-6">
-        <View className={`items-center mb-8 p-6 rounded-xl ${
-          isDark ? 'bg-dark-100' : 'bg-light-100'
-        }`}>
-          <View className={`w-20 h-20 rounded-full items-center justify-center mb-4 ${
-            isDark ? 'bg-dark-200' : 'bg-light-200'
+      <ScrollView 
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        <View className="p-6">
+          <View className={`items-center mb-8 p-6 rounded-xl ${
+            isDark ? 'bg-dark-100' : 'bg-light-100'
           }`}>
-            <Ionicons
-              name="person"
-              size={40}
-              color={isDark ? '#AB8BFF' : '#7B5CF5'}
-            />
+            <View className={`w-20 h-20 rounded-full items-center justify-center mb-4 ${
+              isDark ? 'bg-dark-200' : 'bg-light-200'
+            }`}>
+              <Ionicons
+                name="person"
+                size={40}
+                color={isDark ? '#AB8BFF' : '#7B5CF5'}
+              />
+            </View>
+            <Text className={`text-xl font-bold mb-1 ${isDark ? 'text-white' : 'text-dark-100'}`}>
+              John Doe
+            </Text>
+            <Text className={`${isDark ? 'text-light-100' : 'text-light-300'}`}>
+              john.doe@example.com
+            </Text>
           </View>
-          <Text className={`text-xl font-bold mb-1 ${isDark ? 'text-white' : 'text-dark-100'}`}>
-            John Doe
-          </Text>
-          <Text className={`${isDark ? 'text-light-100' : 'text-light-300'}`}>
-            john.doe@example.com
-          </Text>
+
+          <ProfileSection title="Account Settings">
+            <SettingItem
+              icon="mail-outline"
+              title="Change Email"
+              value="john.doe@example.com"
+              onPress={() => console.log('Change email')}
+            />
+            <SettingItem
+              icon="lock-closed-outline"
+              title="Change Password"
+              onPress={() => console.log('Change password')}
+            />
+          </ProfileSection>
+
+          <ProfileSection title="Preferences">
+            <SettingItem
+              icon="notifications-outline"
+              title="Notifications"
+              isSwitch
+              value={notifications}
+              onValueChange={setNotifications}
+            />
+            <SettingItem
+              icon="moon-outline"
+              title="Dark Mode"
+              isSwitch
+              value={isDark}
+              onValueChange={toggleTheme}
+            />
+          </ProfileSection>
+
+          <ProfileSection title="App Info">
+            <SettingItem
+              icon="information-circle-outline"
+              title="Version"
+              value="1.0.0"
+            />
+            <SettingItem
+              icon="document-text-outline"
+              title="Terms of Service"
+              onPress={() => console.log('Terms of Service')}
+            />
+            <SettingItem
+              icon="shield-outline"
+              title="Privacy Policy"
+              onPress={() => console.log('Privacy Policy')}
+            />
+          </ProfileSection>
+
+          <TouchableOpacity
+            className={`mt-6 p-4 rounded-lg ${isDark ? 'bg-dark-200' : 'bg-light-200'}`}
+            onPress={() => console.log('Logout')}
+          >
+            <Text className={`text-center font-bold ${isDark ? 'text-white' : 'text-dark-100'}`}>
+              Logout
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        <ProfileSection title="Account Settings">
-          <SettingItem
-            icon="mail-outline"
-            title="Change Email"
-            value="john.doe@example.com"
-            onPress={() => console.log('Change email')}
-          />
-          <SettingItem
-            icon="lock-closed-outline"
-            title="Change Password"
-            onPress={() => console.log('Change password')}
-          />
-        </ProfileSection>
-
-        <ProfileSection title="Preferences">
-          <SettingItem
-            icon="notifications-outline"
-            title="Notifications"
-            isSwitch
-            value={notifications}
-            onValueChange={setNotifications}
-          />
-          <SettingItem
-            icon="moon-outline"
-            title="Dark Mode"
-            isSwitch
-            value={isDark}
-            onValueChange={toggleTheme}
-          />
-        </ProfileSection>
-
-        <ProfileSection title="App Info">
-          <SettingItem
-            icon="information-circle-outline"
-            title="Version"
-            value="1.0.0"
-          />
-          <SettingItem
-            icon="document-text-outline"
-            title="Terms of Service"
-            onPress={() => console.log('Terms of Service')}
-          />
-          <SettingItem
-            icon="shield-outline"
-            title="Privacy Policy"
-            onPress={() => console.log('Privacy Policy')}
-          />
-        </ProfileSection>
-
-        <TouchableOpacity
-          className={`mt-6 p-4 rounded-lg ${isDark ? 'bg-dark-200' : 'bg-light-200'}`}
-          onPress={() => console.log('Logout')}
-        >
-          <Text className={`text-center font-bold ${isDark ? 'text-white' : 'text-dark-100'}`}>
-            Logout
-          </Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }
